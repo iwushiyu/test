@@ -130,7 +130,7 @@
       created: function () {  
         $("#loading").remove()
         var that = this
-        $.get('/data.json', function (data) {
+        $.get('/content-search/data.json', function (data) {
           that.content = data;
           that.displayContent = data;
           that.tips = '无结果，换个关键词试试？';

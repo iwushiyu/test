@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>生财有术·精华帖索引工具</title>
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+  <style>
+    [v-cloak]{display: none;}
+    .p-30{padding-top: 30px;padding-bottom: 30px;}
+    #app{
+      background: #eef7f6;
+    }
+    .table{background: #fff;}
+    label{
+      color: #007f70;
+      text-align: center;
+      display: block;
+      margin-top: -30px;
+      padding-top: 30px;
+      font-size: 20px;
+    }
+    .table>thead{
+      background: #2d9386;
+      color: #fff;
+    }
+    .table>tbody>tr>td>a{
+      display: block;
+      padding: 8px;
+    }
+    .table>tbody>tr>td:first-child{
+      padding: 8px;
+    }
+    .table>tbody>tr>td{
+      padding: 0;
+    }
+    a {
+      color: #007f70;
+    }
+    td b{
+      color: #bbb;
+      font-weight: normal;
+      font-size: 10px;
+    }
+    .search-tip{ 
+      display: flex;
+      color: #999;
+      font-size: 12px;
+      text-align: center;
+      padding-top: 4px;
+      margin-bottom: 0;
+    }
+    .search-tip>span{ flex: 1; }
+    .form-group{ position: relative; }
+    .clear-keywords{
+      position: absolute;
+      top: 71px;
+      color: #999;
+      right: .8em;
+    }
+  </style>
+</head>
+
+<body>
+  <p id="loading" class="text-center">页面初始化中……</p>
+  <div id="app">
+    <!-- v-cloak等资源加载完，vue才开始工作 -->
+    <div class="container p-30" v-cloak>
+      <div class="form-group mb-5">
+        <!-- label的for属性通过 input 的 id 进行绑定，
+          给<label>加了for属性绑定了input控件后，可以提高鼠标用户的用户体验。
+          点击label也可以触发 input 输入框，进入输入状态 -->
+        <label for="keyword">生财有术精华搜索工具</label>
+        <!-- v-model实现数据双向绑定，当vue实例中的keyword值发生改变时，input输入框的值也会发生改变 -->
+        <input type="text" v-model="keyword" class="form-control" id="keyword" placeholder="输入关键词后将自动搜索">
+        <!-- v-show值为ture则显示，为false不显示,v-show 隐藏 v-if是display:'none' -->
+        <div class="clear-keywords" v-show="showRemoveIcon">
+          <!-- @click为v-on的简写，监测点击事件 -->
+          <span class="glyphicon glyphicon-remove" aria-hidden="true" @click="clearKeywords"></span>
+        </div>
+        <p class="search-tip">
+          <span @click="hotKeyword('')">全部</span>
+          <span @click="hotKeyword('思路')">思路</span>
+          <span @click="hotKeyword('案例')">案例</span>
+          <span @click="hotKeyword('方法')">方法</span>
+          <span @click="hotKeyword('工具')">工具</span>
+          <span @click="hotKeyword('建议')">建议</span>
+          <span @click="hotKeyword('淘客')">淘客</span>
+          <span @click="hotKeyword('品牌')">品牌</span>
+          <span @click="hotKeyword('套利')">套利</span>
+          <span @click="hotKeyword('营销')">营销</span>
+          <span @click="hotKeyword('引流')">引流</span>
+        </p>
+      </div>
+      <!-- //v-if为true才渲染table，v-if为false隐藏是 visibility:hidden; -->
+      <table class="table table-bordered table-striped" v-if="displayContent.length">
+        <thead>
+          <tr>
+            <td>作者</td>
+            <td>主题</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in displayContent" :key="item['l']">
+            <td>{{item['n']}}<br><b>{{item['m']}}</b></td>
+            <!-- :href是v-bind的简写，他存在是因为{{item['t']}}不能作用在 HTML attribute上，而实际生产环境中又需要作用于attribute上 -->
+            <td><a :href="item['l']" target="_blank">{{item['t']}}</a></td> 
+          </tr>
+        </tbody>
+      </table>
+      <!-- v-else与v-if配套使用，v-if不执行，则则执行v-else -->
+      <p class="text-center" v-else>{{tips}}</p>
+    </div>
+  </div>
+  <div></div>
+  <script src="https://cdn.staticfile.org/jquery/2.2.4/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        tips: '数据加载中',
+        keyword: [],
+        showRemoveIcon: false,
+        content: [],
+        displayContent: []
+      },
+      //vue实例创建后开始执行
+      created: function () {  
+        $("#loading").remove()
+        var that = this
+        $.get('/content-search/data.json', function (data) {
+          that.content = data;
+          that.displayContent = data;
+          that.tips = '无结果，换个关键词试试？';
+        }, 'json')
+      },
+      //当监测到keyword的值被改变时，开始执行
+      watch: {    
+        keyword: function (v) {
+          this.showRemoveIcon = v!=='';
+          this.filterCard()
+        }
+      },
+      methods: {
+        clearKeywords: function(keyword){
+          this.keyword = ""
+        },
+        hotKeyword: function(keyword){
+          this.keyword = keyword
+        },
+        filterCard: function () {
+          if ("" === this.keyword) {
+            this.displayContent = this.content;
+            return
+          }
+          var c = this.content.length,
+              e = [];
+          for (var d = 0; d < c; d++) {
+            if (~this.content[d]['c'].indexOf(this.keyword.toLowerCase())) {
+              e.push(this.content[d])
+            }
+          }
+          this.displayContent = e
+        }
+      },
+    })
+  </script>
+</body>
+
+</html>

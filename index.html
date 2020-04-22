@@ -103,7 +103,7 @@
         </thead>
         <tbody>
           <tr v-for="item in displayContent" :key="item['l']">
-            <td @click="jumpTo(item['n'])" target="_blank">{{item['n']}}<br><b>{{item['m']}}</b></td>
+            <td><a @click="jumpTo(item['n'])" target="_blank">{{item['n']}}<br><b>{{item['m']}}</b></a></td>
             <!-- :href是v-bind的简写，他存在是因为{{item['t']}}不能作用在 HTML attribute上，而实际生产环境中又需要作用于attribute上 -->
             <td><a :href="item['l']" target="_blank">{{item['t']}}</a></td> 
           </tr>

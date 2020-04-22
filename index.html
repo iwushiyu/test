@@ -153,7 +153,8 @@
       methods: {
         jumpTo: function(n){
           // window.localStorage.setItem('searchAuthor')
-          window.location.href = '/single.html?su='+encodeURI(n)
+
+          window.location.href = '/single.html?su='+encodeURI(n)//encodeURI是防止带中文参数的url地址无法解析
         },
         clearKeywords: function(keyword){
           this.keyword = ""

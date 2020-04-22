@@ -121,6 +121,7 @@
       created: function () {
         var that = this
         $("#loading").remove();
+        //location.search的作用是识别?和后面带的参数
         var search = location.search ? location.search.replace(/^\?/,'').split("&") : [''];
         var user = "";
         search.forEach(function(e){

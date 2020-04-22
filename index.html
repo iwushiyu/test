@@ -103,7 +103,7 @@
         </thead>
         <tbody>
           <tr v-for="item in displayContent" :key="item['l']">
-            <td>{{item['n']}}<br><b>{{item['m']}}</b></td>
+            <td @click="jumpTo(item['n'])" target="_blank">{{item['n']}}<br><b>{{item['m']}}</b></td>
             <!-- :href是v-bind的简写，他存在是因为{{item['t']}}不能作用在 HTML attribute上，而实际生产环境中又需要作用于attribute上 -->
             <td><a :href="item['l']" target="_blank">{{item['t']}}</a></td> 
           </tr>
@@ -134,6 +134,13 @@
           that.content = data;
           that.displayContent = data;
           that.tips = '无结果，换个关键词试试？';
+
+           // update
+           if(localStorage.getItem('conupd')){ return }
+          setTimeout(function(){
+            localStorage.setItem('conupd',1)
+            layer.msg("点击列表左侧作者名，可以进入Ta的专栏页哦~")
+          },300)
         }, 'json')
       },
       //当监测到keyword的值被改变时，开始执行

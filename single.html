@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <title>生财有术·精华帖索引工具</title>
+  <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/3.4.1/css/bootstrap.min.css">
+  <style>
+    [v-cloak]{display: none;}
+    .p-30{padding-top: 30px;padding-bottom: 30px;}
+    #app{
+      background: #eef7f6;
+    }
+    .table{background: #fff;}
+    label{
+      color: #007f70;
+      text-align: center;
+      display: block;
+      margin-top: -30px;
+      padding-top: 30px;
+      font-size: 20px;
+    }
+    .table>thead{
+      background: #2d9386;
+      color: #fff;
+    }
+    .table>tbody>tr>td>a{
+      display: block;
+      padding: 8px;
+    }
+    .table>tbody>tr>td b{
+      display: block;
+      padding: 8px;
+      color: #666;
+      font-weight: normal;
+      font-size: 12px;
+      line-height: 20px;
+    }
+    .table>tbody>tr>td{
+      padding: 0;
+    }
+    a {
+      color: #007f70;
+    }
+    .search-tip{ 
+      display: flex;
+      color: #999;
+      font-size: 12px;
+      text-align: center;
+      padding-top: 4px;
+      margin-bottom: 0;
+    }
+    .search-tip>span{ flex: 1; }
+    .form-group{ position: relative; }
+    .clear-keywords{
+      position: absolute;
+      top: 71px;
+      color: #999;
+      right: .8em;
+    }
+    .no-wrap{
+      white-space: nowrap;
+    }
+    .back{
+      position: fixed;
+      left: 10px;
+      width: 60px;
+      height: 60px;
+      padding: 8px 0;
+      font-size: 16px;
+      bottom: 10px;
+      text-align: center;
+      color: #fff;
+      background-color: #007f70;
+      box-shadow: 0 1px 4px rgba(0,0,0,.6);
+      border-radius: 50%;
+    }
+  </style>
+</head>
+
+<body>
+  <p id="loading" class="text-center">页面初始化中……</p>
+  <a class="back" href="/content-search/index.html">返回<br>目录</a>
+  <div id="app">
+    <div class="container p-30" v-cloak>
+      <div class="form-group mb-5">
+        <label>生财有术精华专栏<br>{{user}}</label>
+      </div>
+      <table class="table table-bordered table-striped" v-show="displayContent.length">
+        <thead>
+          <tr>
+            <td>时间</td>
+            <td>主题</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="item in displayContent" :key="item['l']">
+            <td class="no-wrap"><b>{{item['m']}}</b></td>
+            <td><a :href="item['l']" target="_blank">{{item['t']}}</a></td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="text-center" v-show="!displayContent.length">正在加载，请稍后……<br>如加载时间过长，请检查用户名是否有误</p>
+    </div>
+  </div>
+  <div></div>
+  <script src="https://cdn.staticfile.org/jquery/2.2.4/jquery.min.js"></script>
+  <script src="https://cdn.staticfile.org/vue/2.6.11/vue.min.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        user: "鱼丸|亦仁助理",
+        keyword: [],
+        showRemoveIcon: false,
+        content: [],
+        displayContent: []
+      },
+      created: function () {
+        var that = this
+        $("#loading").remove();
+        var search = location.search ? location.search.replace(/^\?/,'').split("&") : [''];
+        var user = "";
+        search.forEach(function(e){
+          if(e && e.match("^su=(.*)") && e.match("^su=(.*)").length>1 ){
+            user = decodeURI( e.match("^su=(.*)")[1] )
+            that.user = user;
+          }
+        })
+        console.log(user);
+        $.get('/content-search/data.json', function (data) {
+          var c = data.length,
+              e = [];
+          for (var d = 0; d < c; d++) {
+            if (data[d]['n'] == user) {
+              e.push(data[d])
+            }
+          }
+          that.displayContent = e
+        }, 'json')
+      }
+    })
+  </script>
+</body>
+
+</html>

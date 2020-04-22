@@ -151,6 +151,10 @@
         }
       },
       methods: {
+        jumpTo: function(n){
+          // window.localStorage.setItem('searchAuthor')
+          window.location.href = '/content-search/single.html?su='+encodeURI(n)
+        },
         clearKeywords: function(keyword){
           this.keyword = ""
         },
